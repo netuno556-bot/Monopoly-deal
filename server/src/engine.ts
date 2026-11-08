@@ -230,6 +230,7 @@ export class Engine {
 
     switch (a.t) {
       case 'PLAY_PROPERTY': this.playProperty(s, p, a); break;
+      case 'SET_WILD': this.setWild(s, p, a); break;
       case 'PLAY_BANK': this.playBank(s, p, a); break;
       case 'BUILD': this.build(s, p, a); break;
       case 'RENT': this.playRent(s, p, a); break;
@@ -274,6 +275,51 @@ export class Engine {
     this.takeFromHand(p, a.uid);
     this.addToGroup(p, card);
     this.log(s, `${p.name} jogou ${def.name}${card.color ? ` (${card.color})` : ''}`, p.id);
+  }
+
+  /** Trocar a cor de um curinga que já está na mesa (custa 1 jogada) */
+  private setWild(s: GameState, p: PlayerState, a: { uid: string; color: CardColor }): void {
+    const src = p.groups.find(g => g.cards.some(c => c.uid === a.uid));
+    if (!src) throw new GameError('NOT_FOUND', 'Essa carta não está nas suas propriedades');
+    const card = src.cards.find(c => c.uid === a.uid)!;
+    const def = CARDS[card.defId];
+    if (def.type !== 'wildProperty') {
+      throw new GameError('BAD_TYPE', 'Só curingas podem trocar de cor');
+    }
+    if (src.color === a.color) {
+      throw new GameError('BAD_COLOR', 'O curinga já está nessa cor');
+    }
+    // Curinga de 2 cores só vai para uma das duas cores impressas na carta
+    if (def.colors && def.colors.length > 0 && !def.colors.includes(a.color)) {
+      throw new GameError(
+        'BAD_COLOR',
+        `Essa curinga só aceita uma das cores da carta (${def.colors.join(' ou ')})`,
+      );
+    }
+    // Curinga geral: precisa de um grupo existente da nova cor (mesma regra de jogar)
+    if (!def.colors || def.colors.length === 0) {
+      const g = this.groupOf(p, a.color);
+      if (!g || g.cards.length === 0) {
+        throw new GameError(
+          'NO_GROUP',
+          'Você ainda não tem um conjunto dessa cor na mesa',
+        );
+      }
+    }
+    // Conjunto com prédio não pode ficar incompleto (o curinga sai da conta)
+    if ((src.house || src.hotel) && src.cards.length - 1 < SET_SIZE[src.color]) {
+      throw new GameError(
+        'HAS_BUILDING',
+        'Esse conjunto tem Casa/Hotel — o curinga não pode sair dele agora',
+      );
+    }
+    // Sai do grupo atual (grupo que ficar vazio é removido)
+    src.cards = src.cards.filter(c => c.uid !== a.uid);
+    if (src.cards.length === 0) p.groups = p.groups.filter(g => g !== src);
+    // Entra no grupo da nova cor
+    card.color = a.color;
+    this.addToGroup(p, card);
+    this.log(s, `${p.name} moveu um curinga para ${a.color}`, p.id);
   }
 
   private playBank(s: GameState, p: PlayerState, a: { uid: string }): void {

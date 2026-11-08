@@ -30,7 +30,9 @@ export type Flow =
   /** Descarte obrigatório (mão > limite) */
   | { kind: 'discard' }
   /** Escolher cor do aluguel curinga */
-  | { kind: 'rentColor'; card: CardInst };
+  | { kind: 'rentColor'; card: CardInst }
+  /** Trocar a cor de um curinga que já está na mesa */
+  | { kind: 'recolor'; card: CardInst };
 
 interface Store {
   connected: boolean;
@@ -40,6 +42,8 @@ interface Store {
   notice: NoticePayload | null;
   flow: Flow | null;
   selecting: Set<string>; // cartas marcadas (pagar/descartar)
+  /** Tela de pagamento minimizada (chip flutuante) */
+  payMinimized: boolean;
 
   // chat da sala
   chat: ChatMsg[];
@@ -53,6 +57,7 @@ interface Store {
   showNotice: (n: NoticePayload) => void;
   clearError: () => void;
   setFlow: (f: Flow | null) => void;
+  setPayMinimized: (v: boolean) => void;
   toggleSelect: (uid: string) => void;
   clearSelection: () => void;
   openChat: () => void;
@@ -81,6 +86,7 @@ export const useStore = create<Store>((set, get) => ({
   notice: null,
   flow: null,
   selecting: new Set<string>(),
+  payMinimized: false,
   chat: [],
   chatOpen: false,
   chatUnread: 0,
@@ -91,7 +97,14 @@ export const useStore = create<Store>((set, get) => ({
   showError: m => set({ error: m, notice: null }),
   showNotice: n => set({ notice: n, error: null }),
   clearError: () => set({ error: null }),
-  setFlow: f => set({ flow: f, selecting: new Set() }),
+  // Ao sair do fluxo de pagamento, o chip é zerado; ao (re)abrir, mantém
+  // o estado — assim "minimizar" só esconde a tela e não perde a seleção.
+  setFlow: f => set({
+    flow: f,
+    selecting: new Set(),
+    payMinimized: f && f.kind === 'pay' ? get().payMinimized : false,
+  }),
+  setPayMinimized: v => set({ payMinimized: v }),
   toggleSelect: uid => {
     const cur = new Set(get().selecting);
     cur.has(uid) ? cur.delete(uid) : cur.add(uid);
@@ -118,7 +131,7 @@ export const useStore = create<Store>((set, get) => ({
   leaveRoom: () => {
     socket.emit(EV.LEAVE);
     set({
-      room: null, flow: null, selecting: new Set(),
+      room: null, flow: null, selecting: new Set(), payMinimized: false,
       chat: [], chatOpen: false, chatUnread: 0,
     });
   },

@@ -286,10 +286,9 @@ export default function Card({ card, selected, dim, onClick, style, className }:
         face = <PropFace color={(def.colors?.[0] ?? 'green') as CardColor} name={def.name} />;
         break;
       case 'wildProperty':
-        // Com cor escolhida, a curinga vira propriedade daquela cor na mesa
-        face = card.color
-          ? <PropFace color={card.color} name={COLOR_LABEL[card.color]} />
-          : <WildFace colors={def.colors ?? []} />;
+        // O curinga CONTINUA sendo curinga na mesa — a cor escolhida fica
+        // registrada só no grupo (mostrada pelo selo colorido no canto).
+        face = <WildFace colors={def.colors ?? []} />;
         break;
       case 'rent':
         face = <RentFace colors={def.rentColors ?? []} />;
@@ -330,6 +329,10 @@ export default function Card({ card, selected, dim, onClick, style, className }:
       {face}
       {def && <span className="c-val">{value}M</span>}
       {def && <span className="c-val c-val--br">{value}M</span>}
+      {/* Selo da cor atual do curinga (o grupo é quem define a cor) */}
+      {card.color && def?.type === 'wildProperty' && (
+        <span className="c-wild-dot" style={{ background: COLOR_HEX[card.color] }} />
+      )}
     </div>
   );
 }

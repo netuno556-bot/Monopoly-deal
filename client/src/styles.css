@@ -1498,6 +1498,51 @@ button {
   border-color: rgba(232, 185, 35, 0.75);
 }
 
+/* Chip da cobrança minimizada (tela de pagamento) */
+.pay-chip {
+  position: fixed;
+  right: 14px;
+  bottom: calc(86px + env(safe-area-inset-bottom));
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100vw - 28px);
+  padding: 10px 16px;
+  border: 1px solid rgba(232, 185, 35, 0.75);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #6b5410, #4a3a0b);
+  color: #ffe9a3;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  animation: banner-in 0.25s ease;
+}
+.pay-chip:hover {
+  filter: brightness(1.12);
+}
+.pay-chip__who {
+  font-weight: 600;
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Selo da cor atual de um curinga na mesa */
+.c-wild-dot {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  z-index: 4;
+}
+
 /* ---------------------------------------------------------------
    9. CHAT
    --------------------------------------------------------------- */

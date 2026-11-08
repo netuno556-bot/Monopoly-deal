@@ -1,7 +1,7 @@
 // Modais da mesa: menu de carta, curinga, alvo, roubos, pagamento e descarte
 import { useState } from 'react';
 import type { CardColor, CardInst, ColorGroup, PlayerView, PendingAction } from '@md/shared';
-import { CARDS, SET_SIZE, cardValue } from '@md/shared';
+import { CARDS, SET_SIZE, ALL_COLORS, cardValue } from '@md/shared';
 import { useStore, type Flow } from '../store';
 import Card, { COLOR_HEX, COLOR_LABEL } from './Card';
 
@@ -200,6 +200,52 @@ function WildModal({ card }: { card: CardInst }) {
           <p className="sub">Você ainda não tem nenhuma dessas cores na mesa — jogue a propriedade primeiro.</p>
         )}
       </div>
+    </Sheet>
+  );
+}
+
+// ------------------------------------------------- trocar cor do curinga na mesa
+function ReColorModal({ card }: { card: CardInst }) {
+  const act = useStore(s => s.act);
+  const me = useStore(s => s.room?.game?.players.find(p => p.id === s.myId));
+  const def = CARDS[card.defId];
+  const allowed = def.colors ?? [];
+  const isDual = allowed.length >= 2;
+  const pool: CardColor[] = allowed.length > 0 ? allowed : ALL_COLORS;
+  const current = me?.groups.find(g => g.cards.some(c => c.uid === card.uid))?.color;
+
+  const pick = (color: CardColor) => { close(); act({ t: 'SET_WILD', uid: card.uid, color }); };
+
+  return (
+    <Sheet
+      title="Trocar a cor do curinga"
+      sub={isDual
+        ? `Esta carta continua sendo curinga — pode ir para ${pool.map(c => COLOR_LABEL[c]).join(' ou ')}.`
+        : 'Escolha uma cor em que você já tenha um conjunto na mesa.'}
+    >
+      <div className="color-grid">
+        {pool.map(c => {
+          const g = me?.groups.find(x => x.color === c);
+          const has = !!g && g.cards.length > 0;
+          // Não pode escolher a cor atual; curinga geral exige grupo existente
+          const can = c !== current && (has || isDual);
+          return (
+            <button
+              key={c}
+              className="color-btn"
+              disabled={!can}
+              style={{ background: COLOR_HEX[c], opacity: can ? 1 : 0.45 }}
+              onClick={() => pick(c)}
+            >
+              {COLOR_LABEL[c]}
+              <small>
+                {c === current ? 'atual' : has ? `${g!.cards.length} na mesa` : isDual ? 'grupo novo' : 'você não tem'}
+              </small>
+            </button>
+          );
+        })}
+      </div>
+      <p className="sub">Custa 1 jogada no seu turno — a carta continua sendo curinga na mesa.</p>
     </Sheet>
   );
 }
@@ -507,11 +553,26 @@ function PayModal() {
   const selecting = useStore(s => s.selecting);
   const clearSelection = useStore(s => s.clearSelection);
   const setFlow = useStore(s => s.setFlow);
+  const payMinimized = useStore(s => s.payMinimized);
+  const setPayMinimized = useStore(s => s.setPayMinimized);
   const pending = game?.pending;
   if (!game || !me || !pending || pending.stage !== 'PAY' || pending.defenderId !== me.id) return null;
 
   const amount = pending.amount ?? 0;
   const initiator = game.players.find(p => p.id === pending.initiatorId)?.name ?? '?';
+
+  // Minimizado: vira um chip flutuante (a seleção fica salva no store)
+  if (payMinimized) {
+    return (
+      <button
+        className="pay-chip"
+        onClick={() => setPayMinimized(false)}
+        title="Voltar para a tela de pagamento"
+      >
+        💸 Pagar {amount}M <span className="pay-chip__who">para {initiator}</span> ▲
+      </button>
+    );
+  }
 
   // Só pode pagar com dinheiro do banco e propriedades de conjuntos incompletos
   const selectableCards = [
@@ -553,7 +614,7 @@ function PayModal() {
     <Sheet
       title={`Pagar ${amount}M para ${initiator}`}
       sub="Escolha como pagar: dinheiro do banco e/ou propriedades de conjuntos incompletos. Se não cobrir a dívida, selecione tudo que tem (você paga só o que tiver — nunca fica devendo)."
-      onClose={close}
+      onClose={() => setPayMinimized(true)}
     >
       <div className="pay-total">
         <span>Selecionado: <b className={covers ? 'ok' : 'bad'}>{sum}M</b></span>
@@ -595,7 +656,9 @@ function PayModal() {
       )}
 
       <div className="sheet-actions">
-        <button className="btn btn--ghost" onClick={close}>Cancelar</button>
+        <button className="btn btn--ghost" onClick={() => setPayMinimized(true)}>
+          — Minimizar
+        </button>
         <button className="btn btn--gold" disabled={!canPay} onClick={pay}>
           {covers ? `💸 Pagar ${sum}M` : `💸 Pagar tudo (${sum}M)`}
         </button>
@@ -647,6 +710,7 @@ export default function Modals() {
   switch (flow.kind) {
     case 'menu': return <MenuModal card={flow.card} />;
     case 'wild': return <WildModal card={flow.card} />;
+    case 'recolor': return <ReColorModal card={flow.card} />;
     case 'build': return <BuildModal card={flow.card} />;
     case 'rentColor': return <RentModal card={flow.card} />;
     case 'target': return <TargetModal card={flow.card} op={flow.op} />;

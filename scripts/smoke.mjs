@@ -82,8 +82,8 @@ try {
     g.players.reduce((t, p) => t + p.handCount + p.bank.length +
       p.groups.reduce((x, gg) => x + gg.cards.length + (gg.house ? 1 : 0) + (gg.hotel ? 1 : 0), 0), 0) +
     g.drawCount + g.discardPile.length;
-  if (totalCards !== 108) throw new Error(`cartas no jogo = ${totalCards}, esperado 108`);
-  console.log('OK: baralho integro (108 cartas distribuídas)');
+  if (totalCards !== 107) throw new Error(`cartas no jogo = ${totalCards}, esperado 107`);
+  console.log('OK: baralho integro (107 cartas distribuídas)');
 
   if (errors.length) throw new Error('erros de socket: ' + JSON.stringify(errors));
   console.log('\nSMOKE TESTE PASSOU ✅');

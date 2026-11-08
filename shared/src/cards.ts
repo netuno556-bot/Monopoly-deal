@@ -1,6 +1,8 @@
 // ============================================================
-//  BARALHO — Monopoly Deal (108 cartas)
+//  BARALHO — Monopoly Deal (107 cartas)
 //  Nomes em PT-BR. Valores de aluguel/banco ajustáveis aqui.
+//  Valor de banco: ÚNICO por cor (oficial) — exceto curingas,
+//  que mantêm o valor impresso próprio de cada carta.
 // ============================================================
 
 export type CardColor =
@@ -93,35 +95,37 @@ export const CARD_LIST: CardDef[] = [
   // ---- Dinheiro (20) — distribuição oficial (total M57) ----
   money(1, 6), money(2, 5), money(3, 3), money(4, 3), money(5, 2), money(10, 1),
 
-  // ---- Propriedades (28) ----
+  // ---- Propriedades (28) — valor de banco ÚNICO por cor (oficial) ----
+  // Marrom 1M · Azul-Claro 1M · Rosa 2M · Laranja 2M · Vermelho 3M ·
+  // Amarelo 3M · Verde 4M · Azul-Escuro 4M · Ferrovia 2M · Utilidade 2M
   prop('prop-med',     'Avenida Mediterrânea',   'brown',     1),
   prop('prop-baltic',  'Avenida Báltico',        'brown',     1),
   prop('prop-orient',  'Avenida Oriental',       'lightblue', 1),
-  prop('prop-vermont', 'Avenida Vermont',        'lightblue', 2),
-  prop('prop-conn',    'Avenida Connecticut',    'lightblue', 3),
+  prop('prop-vermont', 'Avenida Vermont',        'lightblue', 1),
+  prop('prop-conn',    'Avenida Connecticut',    'lightblue', 1),
   prop('prop-stcharles', 'Lugar São Carlos',     'pink',      2),
-  prop('prop-states',  'Avenida Estados',        'pink',      3),
-  prop('prop-virginia','Avenida Virgínia',       'pink',      4),
+  prop('prop-states',  'Avenida Estados',        'pink',      2),
+  prop('prop-virginia','Avenida Virgínia',       'pink',      2),
   prop('prop-stjames', 'Lugar São James',        'orange',    2),
-  prop('prop-tennessee','Avenida Tennessee',     'orange',    3),
-  prop('prop-newyork', 'Avenida Nova York',      'orange',    4),
+  prop('prop-tennessee','Avenida Tennessee',     'orange',    2),
+  prop('prop-newyork', 'Avenida Nova York',      'orange',    2),
   prop('prop-kentucky','Avenida Kentucky',       'red',       3),
-  prop('prop-indiana', 'Avenida Indiana',        'red',       4),
-  prop('prop-illinois','Avenida Illinois',       'red',       5),
+  prop('prop-indiana', 'Avenida Indiana',        'red',       3),
+  prop('prop-illinois','Avenida Illinois',       'red',       3),
   prop('prop-atlantic','Avenida Atlântica',      'yellow',    3),
-  prop('prop-ventnor', 'Avenida Ventnor',        'yellow',    4),
-  prop('prop-marvin',  'Jardim Marvin',          'yellow',    5),
+  prop('prop-ventnor', 'Avenida Ventnor',        'yellow',    3),
+  prop('prop-marvin',  'Jardim Marvin',          'yellow',    3),
   prop('prop-pacific', 'Avenida Pacífico',       'green',     4),
-  prop('prop-carolina','Avenida Carolina do Norte','green',   5),
-  prop('prop-pennsy',  'Avenida Pensilvânia',    'green',     6),
-  prop('prop-park',    'Lugar Park',             'darkblue',  6),
-  prop('prop-boardwalk','Quadra Boardwalk',      'darkblue',  7),
+  prop('prop-carolina','Avenida Carolina do Norte','green',   4),
+  prop('prop-pennsy',  'Avenida Pensilvânia',    'green',     4),
+  prop('prop-park',    'Lugar Park',             'darkblue',  4),
+  prop('prop-boardwalk','Quadra Boardwalk',      'darkblue',  4),
   prop('prop-rr-reading','Estrada de Ferro Reading','railroad',2),
   prop('prop-rr-penn', 'Estrada de Ferro Pennsylvania','railroad',2),
   prop('prop-rr-bo',   'Estrada de Ferro B&O',   'railroad',  2),
   prop('prop-rr-short','Estrada de Ferro Short Line','railroad',2),
-  prop('prop-elco',    'Companhia Elétrica',     'utility',   3),
-  prop('prop-water',   'Companhia de Água',      'utility',   3),
+  prop('prop-elco',    'Companhia Elétrica',     'utility',   2),
+  prop('prop-water',   'Companhia de Água',      'utility',   2),
 
   // ---- Curingas de propriedade (11) — composição oficial ----
   // 2 curingas multicolor (10 cores) + 9 curingas de DUAS cores (7 pares).
@@ -149,9 +153,9 @@ export const CARD_LIST: CardDef[] = [
   { defId: 'rent-wild-2', type: 'rent', name: 'Aluguel Curinga', value: 3, rentColors: [], copies: 1 },
   { defId: 'rent-wild-3', type: 'rent', name: 'Aluguel Curinga', value: 3, rentColors: [], copies: 1 },
 
-  // ---- Cartas de ação (36) ----
+  // ---- Cartas de ação (35) — contagens oficiais ----
   action('act-passgo',      'Pass Go (Compre 2)',   'passGo',       1, 10),
-  action('act-sayno',       'Não!',                 'justSayNo',    1, 4),
+  action('act-sayno',       'Não!',                 'justSayNo',    1, 3),
   action('act-debt',        'Cobrador de Dívidas',  'debtCollector',1, 4),
   action('act-sly',         'Negociação Esperta',   'slyDeal',      1, 3),
   action('act-dealbreaker', 'Quebra de Acordo',     'dealBreaker',  1, 2),
@@ -167,12 +171,12 @@ export const CARD_LIST: CardDef[] = [
 export const CARDS: Record<string, CardDef> = {};
 for (const c of CARD_LIST) CARDS[c.defId] = c;
 
-/** Baralho completo (108 defIds com repetição) */
+/** Baralho completo (107 defIds com repetição) */
 export const DECK_DEF_IDS: string[] = CARD_LIST.flatMap(c =>
   Array.from({ length: c.copies }, () => c.defId),
 );
 
-export const DECK_SIZE = DECK_DEF_IDS.length; // 108
+export const DECK_SIZE = DECK_DEF_IDS.length; // 107
 
 /** Valor de uma carta no pagamento/banco */
 export function cardValue(defId: string): number {

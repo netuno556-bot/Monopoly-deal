@@ -32,7 +32,7 @@ monopoly-deal/
 ├── render.yaml                   # config de deploy na nuvem (Render)
 ├── shared/                       # código compartilhado cliente<->servidor
 │   └── src/
-│       ├── cards.ts              # 🎴 baralho completo (108 cartas, PT-BR)
+│       ├── cards.ts              # 🎴 baralho completo (107 cartas, PT-BR)
 │       ├── types.ts              # estado do jogo, ações, configurações
 │       ├── protocol.ts           # eventos do Socket.io (contrato)
 │       └── index.ts
@@ -46,6 +46,7 @@ monopoly-deal/
 │   ├── rent.test.ts              # testes de aluguel
 │   ├── rules.test.ts             # testes de limite de mão e pagamento
 │   ├── steal.test.ts             # testes de roubos e cadeia de "Não!"
+│   ├── wild.test.ts              # curinga na mesa + valores únicos por cor
 │   └── smoke.mjs                 # teste de integração ponta a ponta
 └── client/                       # 🖥️ frontend React (Vite)
     ├── index.html
@@ -82,7 +83,8 @@ Testes automatizados (os unitários rodam sem servidor; o de integração exige 
 npx tsx scripts/rent.test.ts     # regra de aluguel (31 verificações)
 npx tsx scripts/rules.test.ts    # limite de mão + pagamento automático (17 verificações)
 npx tsx scripts/steal.test.ts    # roubos + cadeia de "Não!" (21 verificações)
-node scripts/smoke.mjs           # cria sala, inicia com bots, valida invariantes (108 cartas)
+npx tsx scripts/wild.test.ts     # curinga na mesa + valores únicos por cor (24 verificações)
+node scripts/smoke.mjs           # cria sala, inicia com bots, valida invariantes (107 cartas)
 ```
 
 Variáveis de ambiente do servidor: `PORT` (padrão 3001), `CORS_ORIGIN` (padrão `*`),
@@ -109,9 +111,14 @@ Sem variável extra, o client usa o proxy do Vite (dev) ou a mesma origem (produ
 
 ## 🎯 Regras Implementadas
 
-- **Baralho de 108 cartas** (valores oficiais): 20 dinheiro, 28 propriedades,
+- **Baralho de 107 cartas** (valores oficiais): 20 dinheiro, 28 propriedades,
   11 curingas (9 de 2 cores + 2 multicoloridos), 13 cartas de aluguel
-  (5 pares duplos ×2 + 3 curingas de aluguel), 30 ações, 3 casas, 3 hotéis
+  (5 pares duplos ×2 + 3 curingas de aluguel), 29 ações (**3 "Não!"**,
+  **2 "Quebra de Acordo"**, 10 Pass Go, 4 Cobrador, 4 Esperta, 4 Forçada,
+  3 Aluguel em Dobro), 3 casas, 3 hotéis
+- **Valor de banco ÚNICO por cor** (como no jogo real): marrom 1M · azul-claro 1M ·
+  rosa 2M · laranja 2M · vermelho 3M · amarelo 3M · verde 4M · azul-escuro 4M ·
+  ferrovia 2M · utilidade 2M (os curingas mantêm o valor impresso próprio)
 - **Tabela de aluguel oficial**: marrom [1,2] · azul-claro [1,2,3] · rosa [1,2,4] ·
   laranja [1,3,5] · vermelho [2,3,6] · amarelo [2,4,6] · verde [2,4,7] ·
   azul-escuro [3,8] · ferrovias [1,2,3,4] · utilidades [1,2]
@@ -128,19 +135,26 @@ Sem variável extra, o client usa o proxy do Vite (dev) ou a mesma origem (produ
   pagar não paga e não é eliminado (regra oficial)
 - **Cartas de aluguel reais**: apenas pares de 2 cores (ex.: Vermelho + Amarelo) e
   curingas de aluguel — sem carta de cor única (como no baralho oficial)
-- **Curingas de 2 cores**: podem **abrir um grupo novo** (você escolhe o lado);
-  o curinga multicolorido só entra em um grupo que você já tem
+- **Curingas**: continuam sendo **curinga na mesa** (selo da cor atual no canto da
+  carta) e podem **trocar de cor depois** — toque no curinga e escolha a nova cor
+  (custa 1 jogada); os de 2 cores podem **abrir um grupo novo** (você escolhe o lado),
+  o multicolorido só vai para um grupo que você já tem
 - **Ações**: Pass Go, Cobrador de Dívidas (5M), Negociação Esperta, Quebra de Acordo,
   Negociação Forçada, **Não!** (cadeia de respostas alternadas — com botões explícitos
   de "Revidar"/"Desistir" no estado invertido), Casa/Hotel
 - **Banco**: **qualquer carta** (aluguel, ação, casa, hotel, propriedade…) pode ir para o
   banco e virar dinheiro — **exceto o curinga** (sempre propriedade); o menu pergunta o
-  destino da carta (banco ou uso na mesa) antes de jogar
+  destino da carta (banco ou uso na mesa) antes de jogar — e o **dinheiro vai para o
+  banco com UM clique** (ele não tem outra utilidade)
 - **Pagamento com ESCOLHA**: ao aceitar uma cobrança (aluguel/Cobrador de Dívidas), o
   jogador **escolhe com o que paga** — dinheiro do banco e/ou propriedades de conjuntos
   **incompletos**; a seleção tem que cobrir a dívida ou entregar **tudo** que tem na
   mesa (paga só o que tiver) — **nunca fica devendo e não há falência/eliminação**;
-  no tempo esgotado o pagamento sai automático (dinheiro primeiro)
+  no tempo esgotado o pagamento sai automático (dinheiro primeiro);
+  a tela pode ser **minimizada** (vira um chip 💸 flutuante) e volta quando você tocar,
+  **sem perder a seleção**
+- **Mobile**: a mão **rola com o dedo** no celular (scroll horizontal) e o arrasto
+  para a mesa continua funcionando
 - **Mesa visível**: cada jogador (inclusive você) mostra as cartas jogadas como
   **cartas em miniatura** por cor (com contador n/total, ★ quando completo e aluguel
   atual) e o **banco com o dinheiro** — estilo "mesa" do Monopoly Deal online
@@ -160,8 +174,7 @@ Sem variável extra, o client usa o proxy do Vite (dev) ou a mesma origem (produ
   elipse rotacionada nos cantos
 
 ### Simplificações documentadas
-- Curinga de 2 cores escolhe a cor **no momento de jogar** (não há fila de atribuição)
-- Valores de banco das propriedades = 1º valor da tabela de aluguel (ajustável em `cards.ts`)
+- Curinga escolhe a cor **ao jogar** e pode **trocar depois** (1 jogada) — ver botões na mesa
 - Sem troca negociada entre jogadores (só Negociação Forçada) — pode ser adicionada
 - Sem reconexão: saiu/desconectou = eliminado da partida
 
@@ -207,7 +220,8 @@ Sem variável extra, o client usa o proxy do Vite (dev) ou a mesma origem (produ
 | `npx tsx scripts/rent.test.ts` | ✅ 31 verificações (aluguel pelas MINHAS propriedades, fila, ESCOLHA de pagamento, pagamento parcial) |
 | `npx tsx scripts/rules.test.ts` | ✅ 17 verificações (limite de mão 7, Pass Go, pagamento parcial sem falência) |
 | `npx tsx scripts/steal.test.ts` | ✅ 21 verificações (roubo muda de dono; cadeia "Não!" revidar/desistir) |
-| `node scripts/smoke.mjs` | ✅ sala, 2 humanos + 4 bots, mãos ocultas, 108 cartas |
+| `npx tsx scripts/wild.test.ts` | ✅ 24 verificações (curinga troca de cor, grupos, prédios, 3 "Não!", 2 "Quebra", valores por cor) |
+| `node scripts/smoke.mjs` | ✅ sala, 2 humanos + 4 bots, mãos ocultas, 107 cartas |
 | E2E navegador (Chrome/CDP): Home → Criar sala → Bot → Iniciar → Mesa (cartas visíveis) → Menu de carta → Voz 🗣️ → Chat | ✅ 18/18 etapas, 0 erros de console |
 
 ---

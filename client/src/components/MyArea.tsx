@@ -1,8 +1,9 @@
 // Área do jogador — inferior da mesa.
 import { useDroppable } from '@dnd-kit/core';
 import type { ColorGroup, PlayerView } from '@md/shared';
-import { RENT_TABLE, SET_SIZE, cardValue } from '@md/shared';
+import { CARDS, RENT_TABLE, SET_SIZE, cardValue } from '@md/shared';
 import Card, { COLOR_HEX, COLOR_LABEL } from './Card';
+import { useStore } from '../store';
 
 function Group({ g }: { g: ColorGroup }) {
   const { isOver, setNodeRef } = useDroppable({ id: `group:${g.color}` });
@@ -26,7 +27,15 @@ function Group({ g }: { g: ColorGroup }) {
       </div>
       <div className="g-cards">
         {g.cards.map(c => (
-          <Card key={c.uid} card={c} style={{ width: 62, height: 89 }} />
+          <Card
+            key={c.uid}
+            card={c}
+            style={{ width: 62, height: 89 }}
+            // Curinga na mesa: toque troca a cor dele
+            onClick={CARDS[c.defId]?.type === 'wildProperty'
+              ? () => useStore.getState().setFlow({ kind: 'recolor', card: c })
+              : undefined}
+          />
         ))}
         {g.house && <span className="g-building" title="Casa (+3M de aluguel)">🏡</span>}
         {g.hotel && <span className="g-building" title="Hotel (+4M de aluguel)">🏨</span>}

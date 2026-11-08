@@ -114,6 +114,8 @@ export interface GameState {
 export type GameAction =
   /** Jogar propriedade/curinga para um grupo de cor */
   | { t: 'PLAY_PROPERTY'; uid: string; color?: CardColor }
+  /** Trocar a cor de um curinga que já está na mesa (custa 1 jogada) */
+  | { t: 'SET_WILD'; uid: string; color: CardColor }
   /** Jogar dinheiro para o banco */
   | { t: 'PLAY_BANK'; uid: string }
   /** Construir Casa/Hotel num conjunto completo */
