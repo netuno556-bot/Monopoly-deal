@@ -1,0 +1,20 @@
+{
+  "name": "Deal Livre - Monopoly Deal Multiplayer",
+  "short_name": "Deal Livre",
+  "description": "Jogo multiplayer de cartas inspirado no Monopoly Deal. Crie uma sala e jogue com amigos.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f3d2e",
+  "theme_color": "#0f3d2e",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

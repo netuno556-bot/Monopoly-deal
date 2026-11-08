@@ -1,0 +1,14 @@
+# Deploy automático no Render (https://render.com)
+# Um único serviço: builda o client e sobe o servidor que serve a SPA + Socket.io.
+services:
+  - type: web
+    name: monopoly-deal
+    runtime: node
+    plan: free # plano grátis (dorme após ~15 min sem acesso)
+    buildCommand: npm install && npm run build
+    startCommand: npx tsx server/src/index.ts
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: CORS_ORIGIN
+        value: '*'

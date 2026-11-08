@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect x="14" y="10" width="52" height="76" rx="6" fill="#1d7a4f" stroke="#fff" stroke-width="4" transform="rotate(-8 40 48)"/>
+  <rect x="34" y="14" width="52" height="76" rx="6" fill="#e63946" stroke="#fff" stroke-width="4" transform="rotate(7 60 52)"/>
+  <text x="50" y="62" font-size="34" text-anchor="middle" transform="rotate(7 60 52)">🎩</text>
+</svg>
