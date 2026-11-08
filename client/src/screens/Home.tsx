@@ -57,7 +57,16 @@ export default function Home() {
   return (
     <div className="center-screen">
       <div>
-        <div className="logo">🎩 DEAL <span>LIVRE</span></div>
+        <div className="logo">
+          {/* Cartola (top hat) desenhada em SVG */}
+          <svg className="logo-hat" viewBox="0 0 72 64" aria-hidden="true">
+            <ellipse cx="36" cy="53" rx="33" ry="8.5" fill="#0e0e12" />
+            <path d="M19 53 L15 18 Q15 8 25 8 L47 8 Q57 8 57 18 L53 53 Z" fill="#1b1b22" />
+            <path d="M18.7 49.5 H53.3 L54.1 40.5 H17.9 Z" fill="#e2b923" />
+            <path d="M25 8 Q36 3.5 47 8 Q36 12.5 25 8 Z" fill="#2a2a33" />
+          </svg>
+          Monopoly-Deal
+        </div>
         <p className="logo-sub">
           Monopoly Deal multiplayer com amigos — crie uma sala, compartilhe o código e jogue
           no celular ou no PC.

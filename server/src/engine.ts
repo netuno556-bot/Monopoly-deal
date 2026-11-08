@@ -486,7 +486,7 @@ export class Engine {
         this.takeFromHand(p, a.uid);
         this.toDiscard(s, card);
         this.openPending(s, 'SLY_DEAL', p, [target], { propUid: a.propUid });
-        this.log(s, `${p.name} usou Negociação Esperta em ${target.name}`, p.id);
+        this.log(s, `${p.name} usou Negociação Esperta em ${target.name} → vai roubar ${CARDS[found.card.defId].name}`, p.id);
         break;
       }
       case 'dealBreaker': {
@@ -499,7 +499,11 @@ export class Engine {
         this.takeFromHand(p, a.uid);
         this.toDiscard(s, card);
         this.openPending(s, 'DEAL_BREAKER', p, [target], { color: a.color });
-        this.log(s, `${p.name} usou Quebra de Acordo em ${target.name} (${a.color})`, p.id);
+        this.log(
+          s,
+          `${p.name} usou Quebra de Acordo em ${target.name} → conjunto ${a.color} (${g.cards.map(c => CARDS[c.defId].name).join(', ')})`,
+          p.id,
+        );
         break;
       }
       case 'forcedDeal': {
@@ -520,7 +524,11 @@ export class Engine {
         this.takeFromHand(p, a.uid);
         this.toDiscard(s, card);
         this.openPending(s, 'FORCED_DEAL', p, [target], { propUid: a.propUid, giveUid: a.giveUid });
-        this.log(s, `${p.name} propôs Negociação Forçada com ${target.name}`, p.id);
+        this.log(
+          s,
+          `${p.name} propôs Negociação Forçada com ${target.name} → entrega ${CARDS[give.card.defId].name} e leva ${CARDS[take.card.defId].name}`,
+          p.id,
+        );
         break;
       }
       default:
@@ -587,7 +595,11 @@ export class Engine {
         const g = this.groupOf(from, color)!;
         from.groups = from.groups.filter(x => x !== g);
         this.mergeGroup(s, initiator, g);
-        this.log(s, `${initiator.name} roubou o conjunto ${color} de ${from.name}`, initiator.id);
+        this.log(
+          s,
+          `${initiator.name} roubou o conjunto ${color} de ${from.name}: ${g.cards.map(c => CARDS[c.defId].name).join(', ')}`,
+          initiator.id,
+        );
         s.pending = null;
         break;
       }
@@ -606,7 +618,11 @@ export class Engine {
         const given = this.takeFromGroups(s, initiator, pend.giveUid!);
         this.addToGroup(initiator, taken);
         this.addToGroup(from, given);
-        this.log(s, `${initiator.name} e ${from.name} fizeram uma troca de propriedades`, initiator.id);
+        this.log(
+          s,
+          `${initiator.name} trocou ${CARDS[given.defId].name} por ${CARDS[taken.defId].name} com ${from.name}`,
+          initiator.id,
+        );
         s.pending = null;
         break;
       }

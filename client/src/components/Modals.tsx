@@ -806,18 +806,57 @@ export function PendingBanner() {
   );
 }
 
-function describePending(p: PendingAction, targetName: string, game: { players: { id: string; name: string }[] }): string {
+function describePending(
+  p: PendingAction,
+  targetName: string,
+  game: { players: { id: string; name: string; groups?: ColorGroup[] }[] },
+): string {
+  // Acha uma carta roubada/trocada pelo uid (as mesas de todos são públicas)
+  const findCard = (uid?: string): CardInst | undefined => {
+    if (!uid) return undefined;
+    for (const pl of game.players)
+      for (const g of pl.groups ?? []) {
+        const c = g.cards.find(x => x.uid === uid);
+        if (c) return c;
+      }
+    return undefined;
+  };
+  const label = (c?: CardInst): string | null => {
+    if (!c) return null;
+    const def = CARDS[c.defId];
+    const col = c.color ?? def?.colors?.[0];
+    return `${def?.name ?? c.defId}${col ? ` (${COLOR_LABEL[col]})` : ''}`;
+  };
+
   switch (p.kind) {
-    case 'RENT':
-      return `Aluguel${p.double ? ' EM DOBRO' : ''} de ${p.amount}M (${(p.rentColors ?? []).join(' + ')}) cobrado de ${targetName}`;
+    case 'RENT': {
+      const colors = p.rentColors ?? [];
+      const shown = colors.length ? colors.map(c => COLOR_LABEL[c]).join(' + ') : 'qualquer cor';
+      return `Aluguel${p.double ? ' EM DOBRO' : ''} de ${p.amount}M (${shown}) cobrado de ${targetName}`;
+    }
     case 'DEBT':
       return `${targetName} deve pagar 5M (Cobrador de Dívidas)`;
-    case 'DEAL_BREAKER':
-      return `${targetName} vai perder o conjunto ${p.color ? COLOR_LABEL[p.color] : ''}`;
-    case 'SLY_DEAL':
-      return `${targetName} vai perder uma propriedade`;
-    case 'FORCED_DEAL':
-      return `Troca forçada com ${targetName}`;
+    case 'DEAL_BREAKER': {
+      const g = game.players
+        .find(pl => pl.id === p.targetId)?.groups
+        ?.find(x => x.color === p.color);
+      const names = g?.cards.map(c => CARDS[c.defId]?.name).join(', ');
+      const buildings = `${g?.house ? ' 🏡' : ''}${g?.hotel ? ' 🏨' : ''}`;
+      return names
+        ? `${targetName} vai perder o conjunto ${p.color ? COLOR_LABEL[p.color] : ''}${buildings}: ${names}`
+        : `${targetName} vai perder o conjunto ${p.color ? COLOR_LABEL[p.color] : ''}`;
+    }
+    case 'SLY_DEAL': {
+      const l = label(findCard(p.propUid));
+      return l
+        ? `${targetName} vai perder ${l}`
+        : `${targetName} vai perder uma propriedade`;
+    }
+    case 'FORCED_DEAL': {
+      const take = label(findCard(p.propUid));
+      const give = label(findCard(p.giveUid));
+      return `Troca forçada com ${targetName}: entrega ${give ?? 'uma propriedade'} e leva ${take ?? 'uma propriedade'}`;
+    }
     default:
       return 'Ação pendente';
   }
