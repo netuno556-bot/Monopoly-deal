@@ -129,6 +129,10 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <footer className="site-footer">
+        🎩 Criado por <b>Alexandre Alencar</b>
+      </footer>
     </div>
   );
 }

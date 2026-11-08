@@ -161,6 +161,10 @@ export default function Lobby() {
           </p>
         )}
       </div>
+
+      <footer className="site-footer">
+        🎩 Criado por <b>Alexandre Alencar</b>
+      </footer>
     </div>
   );
 }

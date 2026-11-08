@@ -295,6 +295,22 @@ button {
   line-height: 1.5;
 }
 
+/* Rodapé das telas de menu/lobby — crédito do autor */
+.site-footer {
+  margin-top: auto;
+  width: min(460px, 94vw);
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+.site-footer b {
+  color: var(--gold-2);
+  font-weight: 800;
+}
+
 .panel {
   width: min(460px, 94vw);
   background: var(--panel);
