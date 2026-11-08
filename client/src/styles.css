@@ -656,8 +656,8 @@ button {
 
 /* descarte vazio: slot tracejado (não se confunde com o baralho) */
 .pile-slot {
-  width: 70px;
-  height: 95px;
+  width: 88px;
+  height: 124px;
   border: 2px dashed rgba(255, 255, 255, 0.22);
   border-radius: 8px;
   display: grid;
@@ -669,8 +669,8 @@ button {
 
 /* glow da carta jogada (resposta pendente) */
 .played-glow {
-  width: 84px;
-  height: 118px;
+  width: 100px;
+  height: 140px;
   background: rgba(255, 215, 0, 0.18);
   border: 3px solid var(--gold);
   border-radius: 10px;
@@ -914,12 +914,19 @@ button {
 
 /* ---------------------------------------------------------------
    7. CARTAS
-   Escala via container queries: da miniatura (34px) até a mão (84px).
+   Escala via container queries: da miniatura (36px) até a mão (100px).
+   Tamanhos por uso (PC / mobile):
+     mão         100×140 / 82×115 (≤760) / 74×104 (≤420)
+     minhas       76×108 / 70×99
+     meu banco    68×97  / 60×85
+     oponentes    56×80  / 50×71
+     banco opp    40×57  / 36×51
+     baralho      88×124 / 76×107
    --------------------------------------------------------------- */
 .card {
   position: relative;
-  width: 84px;
-  height: 118px;
+  width: 100px;
+  height: 140px;
   flex-shrink: 0;
   border-radius: 8px;
   background:
@@ -952,6 +959,28 @@ button {
   opacity: 0.38;
 }
 
+/* --- tamanhos por uso (a mão usa o .card base 100×140) --- */
+.card--table {
+  width: 76px;
+  height: 108px;
+}
+.card--bank {
+  width: 68px;
+  height: 97px;
+}
+.card--opp {
+  width: 56px;
+  height: 80px;
+}
+.card--opp-bank {
+  width: 40px;
+  height: 57px;
+}
+.card--pile {
+  width: 88px;
+  height: 124px;
+}
+
 /* rosto da carta */
 .c-face {
   position: absolute;
@@ -966,7 +995,7 @@ button {
 
 /* --- propriedade --- */
 .c-hdr {
-  font-size: 10.5cqw;
+  font-size: 11.5cqw;
   font-weight: 900;
   line-height: 1.1;
   padding: 4cqw 3cqw;
@@ -985,7 +1014,7 @@ button {
 }
 
 .c-rent-h {
-  font-size: 7.5cqw;
+  font-size: 8.2cqw;
   font-weight: 900;
   text-align: center;
   letter-spacing: 1.5px;
@@ -1007,7 +1036,7 @@ button {
 .c-rent li {
   display: flex;
   justify-content: space-between;
-  font-size: 9.5cqw;
+  font-size: 10.5cqw;
   font-weight: 800;
   color: #22302b;
 }
@@ -1963,15 +1992,21 @@ button {
     padding: 4px 0;
   }
 
-  .center .pile .card {
-    width: 58px;
-    height: 81px;
+  .center .pile .card,
+  .card--pile {
+    width: 76px;
+    height: 107px;
   }
 
   .pile-slot {
-    width: 58px;
-    height: 81px;
-    font-size: 20px;
+    width: 76px;
+    height: 107px;
+    font-size: 22px;
+  }
+
+  .played-glow {
+    width: 76px;
+    height: 107px;
   }
 
   /* barra de turno compacta (contador vira só os pontos) */
@@ -1984,28 +2019,31 @@ button {
     display: none;
   }
 
-  .played-glow {
-    width: 58px;
-    height: 81px;
-  }
-
   /* mão mais compacta */
   .hand {
     gap: 6px;
     padding: 10px 8px 6px;
   }
   .hand .card {
-    width: 64px;
-    height: 90px;
+    width: 82px;
+    height: 115px;
   }
 
-  .my-area .groups .gpanel .card {
-    width: 46px;
-    height: 65px;
+  .card--table {
+    width: 70px;
+    height: 99px;
   }
-  .bank .card {
-    width: 42px;
-    height: 60px;
+  .card--bank {
+    width: 60px;
+    height: 85px;
+  }
+  .card--opp {
+    width: 50px;
+    height: 71px;
+  }
+  .card--opp-bank {
+    width: 36px;
+    height: 51px;
   }
 
   .log {
@@ -2084,8 +2122,18 @@ button {
   }
 
   .hand .card {
-    width: 58px;
-    height: 82px;
+    width: 74px;
+    height: 104px;
+  }
+
+  .card--table {
+    width: 66px;
+    height: 94px;
+  }
+
+  .card--bank {
+    width: 56px;
+    height: 80px;
   }
 }
 

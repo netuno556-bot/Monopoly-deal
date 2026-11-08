@@ -50,7 +50,7 @@ function Opponent({ p, game }: { p: PlayerView; game: GameStateView }) {
               </div>
               <div className="og-cards">
                 {g.cards.map(c => (
-                  <Card key={c.uid} card={c} style={{ width: 44, height: 63 }} />
+                  <Card key={c.uid} card={c} className="card--opp" />
                 ))}
               </div>
             </div>
@@ -65,7 +65,7 @@ function Opponent({ p, game }: { p: PlayerView; game: GameStateView }) {
             {p.bank.length === 0 ? (
               <span className="og-empty">sem dinheiro</span>
             ) : (
-              p.bank.map(c => <Card key={c.uid} card={c} style={{ width: 34, height: 49 }} />)
+              p.bank.map(c => <Card key={c.uid} card={c} className="card--opp-bank" />)
             )
             }
           </div>

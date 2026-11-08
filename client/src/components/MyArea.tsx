@@ -30,7 +30,7 @@ function Group({ g }: { g: ColorGroup }) {
           <Card
             key={c.uid}
             card={c}
-            style={{ width: 62, height: 89 }}
+            className="card--table"
             // Curinga na mesa: toque troca a cor dele
             onClick={CARDS[c.defId]?.type === 'wildProperty'
               ? () => useStore.getState().setFlow({ kind: 'recolor', card: c })
@@ -69,7 +69,7 @@ export default function MyArea({ me }: { me: PlayerView }) {
         ) : (
           <>
             {me.bank.map(c => (
-              <Card key={c.uid} card={c} style={{ width: 56, height: 81 }} />
+              <Card key={c.uid} card={c} className="card--bank" />
             ))}
             <b className="bank-total">Σ {bankTotal}M</b>
           </>

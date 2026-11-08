@@ -469,7 +469,7 @@ function PickPropModal({
     <Sheet title={`Roubar propriedade de ${target.name}`} sub="Negociação Esperta não pode tirar de conjuntos completos.">
       <div className="pick-grid">
         {cards.map(c => (
-          <Card key={c.uid} card={c} onClick={() => steal({ propUid: c.uid })} style={{ width: 74, height: 105 }} />
+          <Card key={c.uid} card={c} onClick={() => steal({ propUid: c.uid })} style={{ width: 88, height: 125 }} />
         ))}
         {cards.length === 0 && <p className="sub">Nada disponível para roubar.</p>}
       </div>
@@ -490,7 +490,7 @@ function GivePropModal({ card, targetId }: { card: CardInst; targetId: string })
             key={c.uid}
             card={c}
             onClick={() => setFlow({ kind: 'giveProp2', card, targetId, giveUid: c.uid })}
-            style={{ width: 74, height: 105 }}
+            style={{ width: 88, height: 125 }}
           />
         ))}
         {cards.length === 0 && <p className="sub">Você não tem propriedades em conjuntos incompletos.</p>}
@@ -515,7 +515,7 @@ function GiveProp2Modal({
             key={c.uid}
             card={c}
             onClick={() => { close(); act({ t: 'ACTION', uid: card.uid, targetId, giveUid, propUid: c.uid }); }}
-            style={{ width: 74, height: 105 }}
+            style={{ width: 88, height: 125 }}
           />
         ))}
         {cards.length === 0 && <p className="sub">O oponente não tem propriedades em conjuntos incompletos.</p>}
@@ -537,7 +537,7 @@ function PickGrid({
         return (
           <div key={c.uid} className="pick" style={{ opacity: ok ? 1 : 0.35 }}>
             {selecting.has(c.uid) && <span className="mark">✓</span>}
-            <Card card={c} selected={selecting.has(c.uid)} onClick={ok ? () => toggleSelect(c.uid) : undefined} style={{ width: 66, height: 94 }} />
+            <Card card={c} selected={selecting.has(c.uid)} onClick={ok ? () => toggleSelect(c.uid) : undefined} style={{ width: 78, height: 110 }} />
           </div>
         );
       })}

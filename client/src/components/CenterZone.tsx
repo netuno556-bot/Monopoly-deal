@@ -8,7 +8,7 @@ function DrawPile() {
   const count = useStore(s => s.room?.game?.drawCount ?? 0);
   return (
     <div className="pile draw-pile" title={`Monte de compra — ${count} carta(s)`}>
-      <Card card={{ uid: 'draw-back', defId: 'back' }} style={{ width: 70, height: 95 }} />
+      <Card card={{ uid: 'draw-back', defId: 'back' }} className="card--pile" />
       <span className="pile-count">{count}</span>
       <span className="pile-label">Compra</span>
     </div>
@@ -21,7 +21,7 @@ function DiscardPile({ game }: { game: GameStateView }) {
   return (
     <div className="pile discard-pile" title={`Monte de descarte — ${count} carta(s)`}>
       {lastCard ? (
-        <Card card={lastCard} style={{ width: 70, height: 95 }} />
+        <Card card={lastCard} className="card--pile" />
       ) : (
         <div className="pile-slot" aria-label="Descarte vazio">🗑️</div>
       )}
